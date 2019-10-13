@@ -4,6 +4,7 @@ Weather Forecast Program
 API Key - 404db912ca95cf6ac23f4362c048124f
 """
 
+from datetime import datetime
 from optparse import OptionParser
 import json
 import requests
@@ -34,10 +35,14 @@ def main():
     parser.add_option('--sunset', action='store_const', const='sunset', dest='sunset', help='Displays sunset time.')
     parser.add_option('--sunrise', action='store_const', const='sunrise', dest='sunrise', help='Displays sunrise time.')
 
-    # Testing Argument for Dumping Entire Response from OpenWeatherMap
+    # Testing Argument for Dumping Entire Response from OpenWeatherMap as well as Parameters sent to API.
     parser.add_option('--debug', action='store_const', const='debug', dest='debug', help='Dumps entire response.')
 
     (options, args) = parser.parse_args()
+
+    # Parameter only takes "Metric", correct:
+    if options.temp == "Celsius":
+        options.temp = "Metric"
 
     parameters = {
         "APPID": options.api,
@@ -46,12 +51,11 @@ def main():
     }
 
     request_url = "http://api.openweathermap.org/data/2.5/weather?"
-
     response = requests.get(request_url, params=parameters)
 
-    print("\nResponse Code = " + str(response.status_code))
-
+    # Debug Conditional
     if options.debug:
+        print("\nResponse Code = " + str(response.status_code))
         print("Parameters: " + str(options)) # Parameters Inputted by User
         jprint(response.json()) # Dump Full Output from OpenWeatherMap
 
@@ -60,7 +64,16 @@ def main():
     temp_min = str(response.json()['main']['temp_min'])
     temp_max = str(response.json()['main']['temp_max'])
 
-    print("\nThe temperature in " + location + " ranges from "+ temp_min +" - "+temp_max+" celsius.\n")
+    time_stamp = datetime.utcfromtimestamp(int(response.json()['dt'])).strftime('%Y-%m-%d %H:%M:%S+00')
+
+    #TODO: Conditional Outputs depending on non-api parameters
+
+    if options.time:
+        print("\nOn " + str(time_stamp + ", the temperature in [" + location + "] ranges from "+ temp_min +" - "
+                            +temp_max+" celsius.\n"))
+
+    else:
+        print("\nThe temperature in [" + location + "] ranges from "+ temp_min +" - "+temp_max+" celsius.\n")
 
 if __name__=="__main__":
     main()
