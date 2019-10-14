@@ -9,10 +9,12 @@ from optparse import OptionParser
 import json
 import requests
 
+
 def jprint(obj):
     # Creates a formatted string of the Python JSON object
     text = json.dumps(obj, sort_keys=False, indent=4)
     print("\n"+text+"\n")
+
 
 def main():
 
@@ -20,7 +22,7 @@ def main():
 
     parser = OptionParser()
 
-    parser.set_defaults(api=api_default, city="Melbourne,AU", temp='metric')
+    parser.set_defaults(api=api_default, temp='Metric')
     parser.add_option('--api', action='store', dest='api', help='Specify API Key used to connect to OpenWeatherMap.')
     parser.add_option('--city', action='store', dest='city', help='Specify City you would like to check weather of.')
     parser.add_option('--cid', action='store', dest='cid', help='Specify CityID you would like to check weather of.')
@@ -40,24 +42,50 @@ def main():
 
     (options, args) = parser.parse_args()
 
-    # Parameter only takes "Metric", correct:
+    # Count Location Inputs
+    location_inputs = 0
+    if options.city:
+        location_inputs += 1
+    if options.cid:
+        location_inputs += 1
+    if options.gc:
+        location_inputs += 1
+    if options.z:
+        location_inputs += 1
+
+    # Check exactly one of [api, city, cid, gc] have been supplied, else return error message.
+    if location_inputs == 0:
+        print("\nYou have not supplied a location. Please use only one of [api, city, cid, gc].\n")
+        exit(0)
+    if location_inputs > 1:
+        print("\nMultiple chosen locations are specified. Please use only one of [api, city, cid, gc].\n")
+        exit(0)
+
+    # Parameter only takes "Metric" and "Imperial". Correct accordingly:
     if options.temp == "Celsius":
         options.temp = "Metric"
+    if options.temp == "Fahrenheit":
+        options.temp = "Imperial"
 
     parameters = {
         "APPID": options.api,
-        "q" : options.city,
-        "units" : options.temp,
+        "q": options.city,
+        "units": options.temp,
     }
 
     request_url = "http://api.openweathermap.org/data/2.5/weather?"
     response = requests.get(request_url, params=parameters)
 
+    # Check if response was valid
+    if str(response.status_code) == "401":
+        print("\nInvalid API Key Supplied. Please see http://openweathermap.org/faq#error401 for more info.\n")
+        exit(0)
+
     # Debug Conditional
     if options.debug:
         print("\nResponse Code = " + str(response.status_code))
-        print("Parameters: " + str(options)) # Parameters Inputted by User
-        jprint(response.json()) # Dump Full Output from OpenWeatherMap
+        print("Parameters: " + str(options))  # Parameters Inputted by User
+        jprint(response.json())  # Dump Full Output from OpenWeatherMap
 
     location = str(response.json()['name']) + ", " + str(response.json()['sys']['country'])
 
@@ -66,15 +94,85 @@ def main():
 
     time_stamp = datetime.utcfromtimestamp(int(response.json()['dt'])).strftime('%Y-%m-%d %H:%M:%S+00')
 
-    #TODO: Conditional Outputs depending on non-api parameters
+    # TODO: Conditional Outputs depending on non-api parameters
+
+    output_string = "\n"  # Build string depending on parameters
+
+    # Time Output
 
     if options.time:
-        print("\nOn " + str(time_stamp + ", the temperature in [" + location + "] ranges from "+ temp_min +" - "
-                            +temp_max+" celsius.\n"))
-
+        output_string += "On " + str(time_stamp) + "+00, the temperature in [" + location + "] ranges from "
     else:
-        print("\nThe temperature in [" + location + "] ranges from "+ temp_min +" - "+temp_max+" celsius.\n")
+        output_string += "The temperature in [" + location + "] ranges from "
 
-if __name__=="__main__":
+    # Temperature Units
+
+    if options.temp == "Imperial":
+        output_string += temp_min + " - " + temp_max + " Fahrenheit."
+    else:
+        output_string += temp_min + " - " + temp_max + " Celsius."
+
+    # TODO: Pressure
+
+    if options.pressure:
+        pressure = str(response.json()['main']['pressure'])
+        output_string += " Atmospheric Pressure is at " + pressure + "hPa."
+
+    # Cloud
+
+    if options.cloud:
+
+        found_cloudy = False
+
+        # If cloud data is contained in response, offer extended output
+        for i in range(len(response.json()['weather'])):
+            if "Clouds" in str(response.json()['weather'][i]['main']):
+                found_cloudy = True
+                cloud_desc = str(response.json()['weather'][i]['description'])
+                cloud = str(response.json()['clouds']['all'])
+                output_string += " Seeing " + cloud_desc + " with about " + cloud + "% coverage."
+
+        if not found_cloudy:
+            cloud = str(response.json()['clouds']['all'])
+            output_string += " Cloud Density is " + cloud + "%."
+
+    # Humidity
+
+    if options.humidity:
+        humidity = str(response.json()['main']['humidity'])
+        output_string += " Humidity is " + humidity + "%."
+
+    # Wind
+
+    if options.wind:
+        wind_speed = str(response.json()['wind']['speed'])
+        wind_deg = str(response.json()['wind']['deg'])
+
+        # Wind Speed is given in m/s for Metric, miles/hr for Imperial
+        if options.temp == "Imperial":
+            output_string += " Wind is blowing at " + wind_speed + " miles/hr from " + wind_deg + " degrees."
+        else:
+            output_string += " Wind is blowing at " + wind_speed + " metres/s from " + wind_deg + " degrees."
+
+
+    # Sunrise, Sunset
+    # TODO: Convert to Local Timezone??
+
+    if options.sunrise and options.sunset:
+        sunrise = datetime.utcfromtimestamp(int(response.json()['sys']['sunrise'])).strftime('%H:%M:%S')
+        sunset = datetime.utcfromtimestamp(int(response.json()['sys']['sunset'])).strftime('%H:%M:%S')
+        output_string += " Sunrise is at " + str(sunrise) + "+00 , and Sunset is at " + str(sunset) + "+00."
+
+    elif options.sunrise:
+        sunrise = datetime.utcfromtimestamp(int(response.json()['sys']['sunrise'])).strftime('%H:%M:%S')
+        output_string += " Sunrise is at " + str(sunrise) + "+00."
+
+    elif options.sunset:
+        sunset = datetime.utcfromtimestamp(int(response.json()['sys']['sunset'])).strftime('%H:%M:%S')
+        output_string += " Sunset is at " + str(sunset) + "+00."
+
+    print(output_string + "\n")
+
+
+if __name__ == "__main__":
     main()
-
