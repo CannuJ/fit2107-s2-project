@@ -27,7 +27,7 @@ def main():
     parser.add_option('--api', action='store', dest='api', help='Specify API Key used to connect to OpenWeatherMap.')
     parser.add_option('--city', action='store', dest='city', help='Specify City you would like to check weather of.')
     parser.add_option('--cid', action='store', dest='cid', help='Specify CityID you would like to check weather of.')
-    parser.add_option('--gc', action='store', dest='gc', help='Geographic Coordinates for where to to check weather.')
+    parser.add_option('--gc', action='store', dest='gc', help='Geographic Coordinates "Latitude Longitude".')
     parser.add_option('-z', action='store', dest='z', help='Specify ZipCode for where you would like to check weather.')
     parser.add_option('--time', action='store_const', const='time', dest='time', help='Displays date/time.')
     parser.add_option('--temp', action='store', dest='temp', help='Specify units for temperature (Celsius/Fahrenheit.')
@@ -73,11 +73,26 @@ def main():
 
     # Prepare parameters that are sent to API
 
-    parameters = {
-        "APPID": options.api,
-        "q": options.city,
-        "units": options.temp,
-    }
+    if options.gc:
+
+        parameters = {
+            "APPID": options.api,
+            "q": options.city,
+            "id": options.cid,
+            "lat": options.gc.split()[0],
+            "lon": options.gc.split()[1],
+            "zip": options.z,
+            "units": options.temp,
+        }
+
+    else:
+        parameters = {
+            "APPID": options.api,
+            "q": options.city,
+            "id": options.cid,
+            "zip": options.z,
+            "units": options.temp,
+        }
 
     request_url = "http://api.openweathermap.org/data/2.5/weather?"
     response = requests.get(request_url, params=parameters)
@@ -86,6 +101,10 @@ def main():
 
     if str(response.status_code) == "401":
         print("\nInvalid API Key Supplied. Please see http://openweathermap.org/faq#error401 for more info.\n")
+        exit(1)
+
+    if str(response.status_code) == "404":
+        print("\nError 404 - " + str(response.json()['message']) + "\n")
         exit(1)
 
     # Debug Conditional
@@ -97,7 +116,10 @@ def main():
         jprint(response.json())  # Dump Full Output from OpenWeatherMap
         print("\nActual Output:")
 
-    location = str(response.json()['name']) + ", " + str(response.json()['sys']['country'])
+    try:
+        location = str(response.json()['name']) + ", " + str(response.json()['sys']['country'])
+    except KeyError:
+        location = str(response.json()['coord']['lat']) + ", " + str(response.json()['coord']['lon']) + " (Coordinates)"
 
     temp_min = str(response.json()['main']['temp_min'])
     temp_max = str(response.json()['main']['temp_max'])
