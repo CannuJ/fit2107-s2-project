@@ -11,6 +11,7 @@ import requests
 
 
 def jprint(obj):
+
     # Creates a formatted string of the Python JSON object
     text = json.dumps(obj, sort_keys=False, indent=4)
     print("\n"+text+"\n")
@@ -43,6 +44,7 @@ def main():
     (options, args) = parser.parse_args()
 
     # Count Location Inputs
+
     location_inputs = 0
     if options.city:
         location_inputs += 1
@@ -54,18 +56,22 @@ def main():
         location_inputs += 1
 
     # Check exactly one of [api, city, cid, gc] have been supplied, else return error message.
-    if location_inputs == 0:
-        print("\nYou have not supplied a location. Please use only one of [api, city, cid, gc].\n")
-        exit(0)
-    if location_inputs > 1:
-        print("\nMultiple chosen locations are specified. Please use only one of [api, city, cid, gc].\n")
-        exit(0)
 
-    # Parameter only takes "Metric" and "Imperial". Correct accordingly:
+    if location_inputs == 0:
+        print("\nYou have not supplied a location. Please use only one of [city, cid, gc, z].\n")
+        exit(1)
+    if location_inputs > 1:
+        print("\nMultiple chosen locations are specified. Please use only one of [city, cid, gc, z].\n")
+        exit(1)
+
+    # Parameter only takes "Metric" and "Imperial". Correct accordingly
+
     if options.temp == "Celsius":
         options.temp = "Metric"
     if options.temp == "Fahrenheit":
         options.temp = "Imperial"
+
+    # Prepare parameters that are sent to API
 
     parameters = {
         "APPID": options.api,
@@ -77,30 +83,33 @@ def main():
     response = requests.get(request_url, params=parameters)
 
     # Check if response was valid
+
     if str(response.status_code) == "401":
         print("\nInvalid API Key Supplied. Please see http://openweathermap.org/faq#error401 for more info.\n")
-        exit(0)
+        exit(1)
 
     # Debug Conditional
+
     if options.debug:
         print("\nResponse Code = " + str(response.status_code))
-        print("Parameters: " + str(options))  # Parameters Inputted by User
+        print("\nParameters: " + str(options))  # Parameters Inputted by User
+        print("\nSee full json response below:")
         jprint(response.json())  # Dump Full Output from OpenWeatherMap
+        print("\nActual Output:")
 
     location = str(response.json()['name']) + ", " + str(response.json()['sys']['country'])
 
     temp_min = str(response.json()['main']['temp_min'])
     temp_max = str(response.json()['main']['temp_max'])
 
-    time_stamp = datetime.utcfromtimestamp(int(response.json()['dt'])).strftime('%Y-%m-%d %H:%M:%S+00')
-
-    # TODO: Conditional Outputs depending on non-api parameters
+    # Conditional Outputs depending on non-api parameters
 
     output_string = "\n"  # Build string depending on parameters
 
     # Time Output
 
     if options.time:
+        time_stamp = datetime.utcfromtimestamp(int(response.json()['dt'])).strftime('%Y-%m-%d %H:%M:%S+00')
         output_string += "On " + str(time_stamp) + "+00, the temperature in [" + location + "] ranges from "
     else:
         output_string += "The temperature in [" + location + "] ranges from "
@@ -112,7 +121,7 @@ def main():
     else:
         output_string += temp_min + " - " + temp_max + " Celsius."
 
-    # TODO: Pressure
+    # Pressure
 
     if options.pressure:
         pressure = str(response.json()['main']['pressure'])
