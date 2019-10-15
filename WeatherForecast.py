@@ -8,7 +8,7 @@ from datetime import datetime
 from optparse import OptionParser
 import json
 import requests
-
+import sys
 
 def jprint(obj):
 
@@ -16,12 +16,10 @@ def jprint(obj):
     text = json.dumps(obj, sort_keys=False, indent=4)
     print("\n"+text+"\n")
 
-
-def main():
+def parse_args(args):
+    parser = OptionParser()
 
     api_default = "404db912ca95cf6ac23f4362c048124f"
-
-    parser = OptionParser()
 
     parser.set_defaults(api=api_default, temp='Metric')
     parser.add_option('--api', action='store', dest='api', help='Specify API Key used to connect to OpenWeatherMap.')
@@ -42,7 +40,9 @@ def main():
     parser.add_option('--debug', action='store_const', const='debug', dest='debug', help='Dumps entire response.')
 
     (options, args) = parser.parse_args()
+    return parser.parse_args()
 
+def check_num_of_location_input(options):
     # Count Location Inputs
 
     location_inputs = 0
@@ -55,22 +55,9 @@ def main():
     if options.z:
         location_inputs += 1
 
-    # Check exactly one of [api, city, cid, gc] have been supplied, else return error message.
+    return location_inputs
 
-    if location_inputs == 0:
-        print("\nYou have not supplied a location. Please use only one of [city, cid, gc, z].\n")
-        exit(1)
-    if location_inputs > 1:
-        print("\nMultiple chosen locations are specified. Please use only one of [city, cid, gc, z].\n")
-        exit(1)
-
-    # Parameter only takes "Metric" and "Imperial". Correct accordingly
-
-    if options.temp == "Celsius":
-        options.temp = "Metric"
-    if options.temp == "Fahrenheit":
-        options.temp = "Imperial"
-
+def get_response(options):
     # Prepare parameters that are sent to API
 
     if options.gc:
@@ -96,7 +83,9 @@ def main():
 
     request_url = "http://api.openweathermap.org/data/2.5/weather?"
     response = requests.get(request_url, params=parameters)
+    return response
 
+def check_response(response):
     # Check if response was valid
 
     if str(response.status_code) == "401":
@@ -107,20 +96,16 @@ def main():
         print("\nError 404 - " + str(response.json()['message']) + "\n")
         exit(1)
 
-    # Debug Conditional
+def debug(response):
+    print("\nResponse Code = " + str(response.status_code))
+    print("\nParameters: " + str(options))  # Parameters Inputted by User
+    print("\nSee full json response below:")
+    jprint(response.json())  # Dump Full Output from OpenWeatherMap
+    print("\nActual Output:")
 
-    if options.debug:
-        print("\nResponse Code = " + str(response.status_code))
-        print("\nParameters: " + str(options))  # Parameters Inputted by User
-        print("\nSee full json response below:")
-        jprint(response.json())  # Dump Full Output from OpenWeatherMap
-        print("\nActual Output:")
+def print_info(options,response,location):
 
-    try:
-        location = str(response.json()['name']) + ", " + str(response.json()['sys']['country'])
-    except KeyError:
-        location = str(response.json()['coord']['lat']) + ", " + str(response.json()['coord']['lon']) + " (Coordinates)"
-
+    # Temperature
     temp_min = str(response.json()['main']['temp_min'])
     temp_max = str(response.json()['main']['temp_max'])
 
@@ -185,7 +170,6 @@ def main():
         else:
             output_string += " Wind is blowing at " + wind_speed + " metres/s from " + wind_deg + " degrees."
 
-
     # Sunrise, Sunset
     # TODO: Convert to Local Timezone??
 
@@ -203,6 +187,44 @@ def main():
         output_string += " Sunset is at " + str(sunset) + "+00."
 
     print(output_string + "\n")
+
+
+def main():
+
+    (options,args) = parse_args(sys.argv[1:])
+
+
+    location_inputs = check_num_of_location_input(options)
+    # Check exactly one of [api, city, cid, gc] have been supplied, else return error message.
+    if location_inputs == 0:
+        print("\nYou have not supplied a location. Please use only one of [city, cid, gc, z].\n")
+        exit(1)
+    if location_inputs > 1:
+        print("\nMultiple chosen locations are specified. Please use only one of [city, cid, gc, z].\n")
+        exit(1)
+
+    # Parameter only takes "Metric" and "Imperial". Correct accordingly
+    if options.temp == "Celsius":
+        options.temp = "Metric"
+    if options.temp == "Fahrenheit":
+        options.temp = "Imperial"
+
+    response = get_response(options)
+
+    check_response(response)
+
+    # Debug Conditional
+    if options.debug:
+        debug(response)
+
+    # Print city information
+    try:
+        location = str(response.json()['name']) + ", " + str(response.json()['sys']['country'])
+    except KeyError:
+        location = str(response.json()['coord']['lat']) + ", " + str(response.json()['coord']['lon']) + " (Coordinates)"
+
+    # Print all the requested information by user
+    print_info(options,response,location)
 
 
 if __name__ == "__main__":
