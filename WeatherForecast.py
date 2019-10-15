@@ -16,7 +16,7 @@ def jprint(obj):
     text = json.dumps(obj, sort_keys=False, indent=4)
     print("\n"+text+"\n")
 
-def parse_args(args):
+def weather_args():
     parser = OptionParser()
 
     api_default = "404db912ca95cf6ac23f4362c048124f"
@@ -39,8 +39,7 @@ def parse_args(args):
     # Testing Argument for Dumping Entire Response from OpenWeatherMap as well as Parameters sent to API.
     parser.add_option('--debug', action='store_const', const='debug', dest='debug', help='Dumps entire response.')
 
-    (options, args) = parser.parse_args()
-    return parser.parse_args()
+    return parser
 
 def check_num_of_location_input(options):
     # Count Location Inputs
@@ -190,8 +189,8 @@ def print_info(options,response,location):
 
 
 def main():
-
-    (options,args) = parse_args(sys.argv[1:])
+    parser = weather_args()
+    (options,args) = parser.parse_args(sys.argv[1:])
 
 
     location_inputs = check_num_of_location_input(options)
