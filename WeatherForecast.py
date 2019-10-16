@@ -71,8 +71,7 @@ def get_response(options):
         options.temp = "Metric"
     if options.temp == "Fahrenheit":
         options.temp = "Imperial"
-
-    if options.temp != "Metric" or "Imperial":
+    else:
         print("\nInvalid temperature type, outputting in Celsius (C)")
         options.temp = "Metric"
 
