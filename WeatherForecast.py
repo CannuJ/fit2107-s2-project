@@ -53,13 +53,13 @@ def check_num_of_location_input(options):
     if options.z:
         location_inputs += 1
 
-        # Check exactly one of [api, city, cid, gc] have been supplied, else return error message.
-        if location_inputs == 0:
-            print("\nYou have not supplied a location. Please use only one of [city, cid, gc, z].\n")
-            return False
-        if location_inputs > 1:
-            print("\nMultiple chosen locations are specified. Please use only one of [city, cid, gc, z].\n")
-            return False
+    # Check exactly one of [api, city, cid, gc] have been supplied, else return error message.
+    if location_inputs == 0:
+        print("\nYou have not supplied a location. Please use only one of [city, cid, gc, z].\n")
+        return False
+    if location_inputs > 1:
+        print("\nMultiple chosen locations are specified. Please use only one of [city, cid, gc, z].\n")
+        return False
 
     return True
 
@@ -95,6 +95,7 @@ def get_response(options):
     response = requests.get(request_url, params=parameters)
     return response
 
+
 def check_response(response):
     # Check if response was valid
 
@@ -108,6 +109,10 @@ def check_response(response):
 
     if str(response.status_code) == "404":
         print("\nError 404 - " + str(response.json()['message']) + "\n")
+        exit(1)
+
+    if str(response.status_code) == "429":
+        print("\nError 429 - " + str(response.json()['message']) + "\n")
         exit(1)
 
 def debug(response, options):
