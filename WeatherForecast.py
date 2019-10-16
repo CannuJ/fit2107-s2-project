@@ -66,6 +66,16 @@ def check_num_of_location_input(options):
 def get_response(options):
     # Prepare parameters that are sent to API
 
+    # Parameter only takes "Metric" and "Imperial". Correct accordingly
+    if options.temp == "Celsius":
+        options.temp = "Metric"
+    if options.temp == "Fahrenheit":
+        options.temp = "Imperial"
+
+    if options.temp != "Metric" or "Imperial":
+        print("Woah slow down there sonny!")
+        print("Temperatures outputting in Kelvin (K)")
+
     if options.gc:
 
         try:
@@ -141,9 +151,10 @@ def print_info(options,response,location):
                                             int(response.json()['timezone'])).strftime('%Y-%m-%d %H:%M:%S')
         time_offset = str(int(response.json()['timezone']) // 3600)
 
-        if int(time_offset) > 0 < 10:
+        if (0 < int(time_offset)) and (int(time_offset) < 10):
             time_offset = "+0" + str(time_offset)
         elif int(time_offset) >= 10:
+
             time_offset = "+" + str(time_offset)
         elif int(time_offset) > -10:
             time_offset = str(time_offset[0]) + "0" + str(time_offset[1])
@@ -276,12 +287,6 @@ def main():
 
     if not check_num_of_location_input(options):
         exit(1)
-
-    # Parameter only takes "Metric" and "Imperial". Correct accordingly
-    if options.temp == "Celsius":
-        options.temp = "Metric"
-    if options.temp == "Fahrenheit":
-        options.temp = "Imperial"
 
     response = get_response(options)
 
