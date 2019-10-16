@@ -173,17 +173,28 @@ def print_info(options,response,location):
     # TODO: Convert to Local Timezone??
 
     if options.sunrise and options.sunset:
-        sunrise = datetime.utcfromtimestamp(int(response.json()['sys']['sunrise'])).strftime('%H:%M:%S')
-        sunset = datetime.utcfromtimestamp(int(response.json()['sys']['sunset'])).strftime('%H:%M:%S')
-        output_string += " Sunrise is at " + str(sunrise) + "+00 , and Sunset is at " + str(sunset) + "+00."
+        sunrise = datetime.utcfromtimestamp(int(response.json()['sys']['sunrise']) +
+                                            int(response.json()['timezone'])).strftime('%H:%M:%S')
+        sunset = datetime.utcfromtimestamp(int(response.json()['sys']['sunset']) +
+                                            int(response.json()['timezone'])).strftime('%H:%M:%S')
+        time_offset = str(int(response.json()['timezone'])//3600)
+
+        output_string += " Sunrise is at " + str(sunrise) + "+" + time_offset + ", and Sunset is at " \
+                         + str(sunset) + "+" + time_offset + "."
 
     elif options.sunrise:
-        sunrise = datetime.utcfromtimestamp(int(response.json()['sys']['sunrise'])).strftime('%H:%M:%S')
-        output_string += " Sunrise is at " + str(sunrise) + "+00."
+        sunrise = datetime.utcfromtimestamp(int(response.json()['sys']['sunrise']) +
+                                            int(response.json()['timezone'])).strftime('%H:%M:%S')
+        time_offset = str(int(response.json()['timezone'])//3600)
+
+        output_string += " Sunrise is at " + str(sunrise) + "+" + time_offset + "."
 
     elif options.sunset:
-        sunset = datetime.utcfromtimestamp(int(response.json()['sys']['sunset'])).strftime('%H:%M:%S')
-        output_string += " Sunset is at " + str(sunset) + "+00."
+        sunset = datetime.utcfromtimestamp(int(response.json()['sys']['sunset']) +
+                                            int(response.json()['timezone'])).strftime('%H:%M:%S')
+        time_offset = str(int(response.json()['timezone'])//3600)
+
+        output_string += " Sunset is at " + str(sunset) + "+" + time_offset + "."
 
     print(output_string + "\n")
 
