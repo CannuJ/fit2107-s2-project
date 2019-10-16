@@ -11,7 +11,6 @@ import requests
 import sys
 
 def jprint(obj):
-
     # Creates a formatted string of the Python JSON object
     text = json.dumps(obj, sort_keys=False, indent=4)
     print("\n"+text+"\n")
@@ -95,9 +94,9 @@ def check_response(response):
         print("\nError 404 - " + str(response.json()['message']) + "\n")
         exit(1)
 
-def debug(response):
+def debug(response, options):
     print("\nResponse Code = " + str(response.status_code))
-    # print("\nParameters: " + str(options))  # Parameters Inputted by User
+    print("\nOptions: " + str(options))  # Options Inputted by User (Both API and Non-Api)
     print("\nSee full json response below:")
     jprint(response.json())  # Dump Full Output from OpenWeatherMap
     print("\nActual Output:")
@@ -176,15 +175,21 @@ def print_info(options,response,location):
         try:
             wind_speed = str(response.json()['wind']['speed'])
             wind_deg = str(response.json()['wind']['deg']) # May not always output
+
+            # Wind Speed is given in m/s for Metric, miles/hr for Imperial
+            if options.temp == "Imperial":
+                output_string += " Wind is blowing at " + wind_speed + " miles/hr from " + wind_deg + " degrees."
+            else:
+                output_string += " Wind is blowing at " + wind_speed + " metres/s from " + wind_deg + " degrees."
+
         except:
             wind_speed = str(response.json()['wind']['speed'])
-            wind_deg = "0"
 
-        # Wind Speed is given in m/s for Metric, miles/hr for Imperial
-        if options.temp == "Imperial":
-            output_string += " Wind is blowing at " + wind_speed + " miles/hr from " + wind_deg + " degrees."
-        else:
-            output_string += " Wind is blowing at " + wind_speed + " metres/s from " + wind_deg + " degrees."
+            # Wind Speed is given in m/s for Metric, miles/hr for Imperial
+            if options.temp == "Imperial":
+                output_string += " Wind is blowing at " + wind_speed + " miles/hr."
+            else:
+                output_string += " Wind is blowing at " + wind_speed + " metres/s."
 
     # Sunrise, Sunset
 
@@ -268,7 +273,7 @@ def main():
 
     # Debug Conditional
     if options.debug:
-        debug(response)
+        debug(response, options)
 
     # Print city information
     try:
