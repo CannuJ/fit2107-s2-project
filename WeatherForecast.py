@@ -101,19 +101,21 @@ def check_response(response):
 
     if str(response.status_code) == "400":
         print("\nError 400 - " + str(response.json()['message']) + "\n")
-        exit(1)
+        return False
 
     if str(response.status_code) == "401":
         print("\nInvalid API Key Supplied. Please see http://openweathermap.org/faq#error401 for more info.\n")
-        exit(1)
+        return False
 
     if str(response.status_code) == "404":
         print("\nError 404 - " + str(response.json()['message']) + "\n")
-        exit(1)
+        return False
 
     if str(response.status_code) == "429":
         print("\nError 429 - " + str(response.json()['message']) + "\n")
-        exit(1)
+        return False
+
+    return True
 
 def debug(response, options):
     print("\nResponse Code = " + str(response.status_code))
@@ -283,7 +285,8 @@ def main():
 
     response = get_response(options)
 
-    check_response(response)
+    if not check_response(response):
+        exit(1)
 
     # Debug Conditional
     if options.debug:
