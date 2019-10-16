@@ -60,15 +60,19 @@ def get_response(options):
 
     if options.gc:
 
-        parameters = {
-            "APPID": options.api,
-            "q": options.city,
-            "id": options.cid,
-            "lat": options.gc.split()[0],
-            "lon": options.gc.split()[1],
-            "zip": options.z,
-            "units": options.temp,
-        }
+        try:
+            parameters = {
+                "APPID": options.api,
+                "q": options.city,
+                "id": options.cid,
+                "lat": options.gc.split()[0],
+                "lon": options.gc.split()[1],
+                "zip": options.z,
+                "units": options.temp,
+            }
+        except:
+            print("\nIncorrect format for Geographic Coordinates. Usage: --gc \"Latitude Longitude\"\n")
+            exit(1)
 
     else:
         parameters = {
@@ -85,6 +89,10 @@ def get_response(options):
 
 def check_response(response):
     # Check if response was valid
+
+    if str(response.status_code) == "400":
+        print("\nError 400 - " + str(response.json()['message']) + "\n")
+        exit(1)
 
     if str(response.status_code) == "401":
         print("\nInvalid API Key Supplied. Please see http://openweathermap.org/faq#error401 for more info.\n")
