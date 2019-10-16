@@ -66,6 +66,33 @@ class parser_test(unittest.TestCase):
         self.assertTrue(option.debug)
 
 
+class check_num_of_location_input_test(unittest.TestCase):
+    def setUp(self):
+        self.parser = weather_args()
+
+    def test_city(self):
+        (option, self.parser) = self.parser.parse_args(["--city=CITY"])
+        self.assertTrue(check_num_of_location_input(option))
+
+    def test_cid(self):
+        (option, self.parser) = self.parser.parse_args(["--cid=code"])
+        self.assertTrue(check_num_of_location_input(option))
+
+    def test_gc(self):
+        (option, self.parser) = self.parser.parse_args(['--gc=[23°01′0″ 113°07′0″]'])
+        self.assertTrue(check_num_of_location_input(option))
+
+    def test_z(self):
+        (option, self.parser) = self.parser.parse_args(['-z=zipcode'])
+        self.assertTrue(check_num_of_location_input(option))
+
+    def test_no__location_input(self):
+        (option, self.parser) = self.parser.parse_args(["--api=API"])
+        self.assertFalse(check_num_of_location_input(option))
+
+    def test_combination(self):
+        (option, self.parser) = self.parser.parse_args(["--city=CITY", "--cid=CityID"])
+        self.assertFalse(check_num_of_location_input(option))
 
 
 
