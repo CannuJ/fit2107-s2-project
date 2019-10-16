@@ -134,7 +134,7 @@ def debug(response, options):
     jprint(response.json())  # Dump Full Output from OpenWeatherMap
     print("\nActual Output:")
 
-def print_info(options,response,location):
+def output_info(options,response,location):
 
     # Temperature
     temp_min = str(response.json()['main']['temp_min'])
@@ -303,7 +303,7 @@ def main():
         location = str(response.json()['coord']['lat']) + ", " + str(response.json()['coord']['lon']) + " (Coordinates)"
 
     # Print all the requested information by user
-    print(print_info(options,response,location))
+    print(output_info(options,response,location))
 
 
 if __name__ == "__main__":
