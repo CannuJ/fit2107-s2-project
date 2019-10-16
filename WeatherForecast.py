@@ -173,8 +173,12 @@ def print_info(options,response,location):
     # Wind
 
     if options.wind:
-        wind_speed = str(response.json()['wind']['speed'])
-        wind_deg = str(response.json()['wind']['deg'])
+        try:
+            wind_speed = str(response.json()['wind']['speed'])
+            wind_deg = str(response.json()['wind']['deg']) # May not always output
+        except:
+            wind_speed = str(response.json()['wind']['speed'])
+            wind_deg = "0"
 
         # Wind Speed is given in m/s for Metric, miles/hr for Imperial
         if options.temp == "Imperial":
