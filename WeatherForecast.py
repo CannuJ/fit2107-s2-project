@@ -98,7 +98,7 @@ def check_response(response):
 
 def debug(response):
     print("\nResponse Code = " + str(response.status_code))
-    print("\nParameters: " + str(options))  # Parameters Inputted by User
+    # print("\nParameters: " + str(options))  # Parameters Inputted by User
     print("\nSee full json response below:")
     jprint(response.json())  # Dump Full Output from OpenWeatherMap
     print("\nActual Output:")
