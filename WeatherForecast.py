@@ -53,7 +53,15 @@ def check_num_of_location_input(options):
     if options.z:
         location_inputs += 1
 
-    return location_inputs
+        # Check exactly one of [api, city, cid, gc] have been supplied, else return error message.
+        if location_inputs == 0:
+            print("\nYou have not supplied a location. Please use only one of [city, cid, gc, z].\n")
+            return False
+        if location_inputs > 1:
+            print("\nMultiple chosen locations are specified. Please use only one of [city, cid, gc, z].\n")
+            return False
+
+    return True
 
 def get_response(options):
     # Prepare parameters that are sent to API
@@ -259,14 +267,7 @@ def main():
     parser = weather_args()
     (options,args) = parser.parse_args(sys.argv[1:])
 
-
-    location_inputs = check_num_of_location_input(options)
-    # Check exactly one of [api, city, cid, gc] have been supplied, else return error message.
-    if location_inputs == 0:
-        print("\nYou have not supplied a location. Please use only one of [city, cid, gc, z].\n")
-        exit(1)
-    if location_inputs > 1:
-        print("\nMultiple chosen locations are specified. Please use only one of [city, cid, gc, z].\n")
+    if not check_num_of_location_input(options):
         exit(1)
 
     # Parameter only takes "Metric" and "Imperial". Correct accordingly
