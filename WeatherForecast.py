@@ -278,7 +278,7 @@ def print_info(options,response,location):
 
         output_string += " Sunset is at " + str(sunset) + str(time_offset) + "."
 
-    print(output_string + "\n")
+    return output_string + "\n"
 
 
 def main():
@@ -304,7 +304,7 @@ def main():
         location = str(response.json()['coord']['lat']) + ", " + str(response.json()['coord']['lon']) + " (Coordinates)"
 
     # Print all the requested information by user
-    print_info(options,response,location)
+    print(print_info(options,response,location))
 
 
 if __name__ == "__main__":
