@@ -115,8 +115,21 @@ def print_info(options,response,location):
     # Time Output
 
     if options.time:
-        time_stamp = datetime.utcfromtimestamp(int(response.json()['dt'])).strftime('%Y-%m-%d %H:%M:%S+00')
-        output_string += "On " + str(time_stamp) + "+00, the temperature in [" + location + "] ranges from "
+        time_stamp = datetime.utcfromtimestamp(int(response.json()['dt'])+
+                                            int(response.json()['timezone'])).strftime('%Y-%m-%d %H:%M:%S')
+        time_offset = str(int(response.json()['timezone']) // 3600)
+
+        if int(time_offset) > 0 < 10:
+            time_offset = "+0" + str(time_offset)
+        elif int(time_offset) >= 10:
+            time_offset = "+" + str(time_offset)
+        elif int(time_offset) > -10:
+            time_offset = str(time_offset[0]) + "0" + str(time_offset[1])
+        else:
+            time_offset = str(time_offset)
+
+        output_string += "On " + str(time_stamp) + str(time_offset) + \
+                         ", the temperature in [" + location + "] ranges from "
     else:
         output_string += "The temperature in [" + location + "] ranges from "
 
@@ -170,7 +183,6 @@ def print_info(options,response,location):
             output_string += " Wind is blowing at " + wind_speed + " metres/s from " + wind_deg + " degrees."
 
     # Sunrise, Sunset
-    # TODO: Convert to Local Timezone??
 
     if options.sunrise and options.sunset:
         sunrise = datetime.utcfromtimestamp(int(response.json()['sys']['sunrise']) +
@@ -179,22 +191,49 @@ def print_info(options,response,location):
                                             int(response.json()['timezone'])).strftime('%H:%M:%S')
         time_offset = str(int(response.json()['timezone'])//3600)
 
-        output_string += " Sunrise is at " + str(sunrise) + "+" + time_offset + ", and Sunset is at " \
-                         + str(sunset) + "+" + time_offset + "."
+        if int(time_offset) > 0 < 10:
+            time_offset = "+0" + str(time_offset)
+        elif int(time_offset) >= 10:
+            time_offset = "+" + str(time_offset)
+        elif int(time_offset) > -10:
+            time_offset = str(time_offset[0]) + "0" +  str(time_offset[1])
+        else:
+            time_offset = str(time_offset)
+
+        output_string += " Sunrise is at " + str(sunrise) + str(time_offset) + ", and Sunset is at " \
+                         + str(sunset) + str(time_offset) + "."
 
     elif options.sunrise:
         sunrise = datetime.utcfromtimestamp(int(response.json()['sys']['sunrise']) +
                                             int(response.json()['timezone'])).strftime('%H:%M:%S')
         time_offset = str(int(response.json()['timezone'])//3600)
 
-        output_string += " Sunrise is at " + str(sunrise) + "+" + time_offset + "."
+        if int(time_offset) > 0 < 10:
+            time_offset = "+0" + str(time_offset)
+        elif int(time_offset) >= 10:
+            time_offset = "+" + str(time_offset)
+        elif int(time_offset) > -10:
+            time_offset = str(time_offset[0]) + "0" + str(time_offset[1])
+        else:
+            time_offset = str(time_offset)
+
+        output_string += " Sunrise is at " + str(sunrise) + str(time_offset) + "."
 
     elif options.sunset:
         sunset = datetime.utcfromtimestamp(int(response.json()['sys']['sunset']) +
                                             int(response.json()['timezone'])).strftime('%H:%M:%S')
         time_offset = str(int(response.json()['timezone'])//3600)
 
-        output_string += " Sunset is at " + str(sunset) + "+" + time_offset + "."
+        if int(time_offset) > 0 < 10:
+            time_offset = "+0" + str(time_offset)
+        elif int(time_offset) >= 10:
+            time_offset = "+" + str(time_offset)
+        elif int(time_offset) > -10:
+            time_offset = str(time_offset[0]) + "0" + str(time_offset[1])
+        else:
+            time_offset = str(time_offset)
+
+        output_string += " Sunset is at " + str(sunset) + str(time_offset) + "."
 
     print(output_string + "\n")
 
