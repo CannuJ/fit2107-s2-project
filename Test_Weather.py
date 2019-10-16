@@ -5,6 +5,7 @@ from WeatherForecast import *
 from unittest.mock import patch
 import sys
 
+
 class parser_test(unittest.TestCase):
     def setUp(self):
         self.parser = weather_args()
@@ -22,7 +23,7 @@ class parser_test(unittest.TestCase):
         self.assertTrue(option.cid)
 
     def test_gc(self):
-        (option, self.parser) = self.parser.parse_args(['--gc=[23°01′0″ 113°07′0″]'])
+        (option, self.parser) = self.parser.parse_args(['--gc="10 10"'])
         self.assertTrue(option.gc)
 
     def test_z(self):
@@ -64,6 +65,10 @@ class parser_test(unittest.TestCase):
     def test_debug(self):
         (option, self.parser) = self.parser.parse_args(['--debug'])
         self.assertTrue(option.debug)
+
+    def test_invalid(self):
+        with self.assertRaises(SystemExit):
+            self.parser.parse_args(['--k'])
 
 
 class check_num_of_location_input_test(unittest.TestCase):
