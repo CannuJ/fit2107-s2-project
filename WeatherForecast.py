@@ -73,8 +73,8 @@ def get_response(options):
         options.temp = "Imperial"
 
     if options.temp != "Metric" or "Imperial":
-        print("Woah slow down there sonny!")
-        print("Temperatures outputting in Kelvin (K)")
+        print("\nInvalid temperature type, outputting in Celsius (C)")
+        options.temp = "Metric"
 
     if options.gc:
 
@@ -154,7 +154,6 @@ def print_info(options,response,location):
         if (0 < int(time_offset)) and (int(time_offset) < 10):
             time_offset = "+0" + str(time_offset)
         elif int(time_offset) >= 10:
-
             time_offset = "+" + str(time_offset)
         elif int(time_offset) > -10:
             time_offset = str(time_offset[0]) + "0" + str(time_offset[1])
@@ -232,14 +231,14 @@ def print_info(options,response,location):
                                             int(response.json()['timezone'])).strftime('%H:%M:%S')
         sunset = datetime.utcfromtimestamp(int(response.json()['sys']['sunset']) +
                                             int(response.json()['timezone'])).strftime('%H:%M:%S')
-        time_offset = str(int(response.json()['timezone'])//3600)
+        time_offset = str(int(response.json()['timezone']) // 3600)
 
-        if int(time_offset) > 0 < 10:
+        if (0 < int(time_offset)) and (int(time_offset) < 10):
             time_offset = "+0" + str(time_offset)
         elif int(time_offset) >= 10:
             time_offset = "+" + str(time_offset)
         elif int(time_offset) > -10:
-            time_offset = str(time_offset[0]) + "0" +  str(time_offset[1])
+            time_offset = str(time_offset[0]) + "0" + str(time_offset[1])
         else:
             time_offset = str(time_offset)
 
@@ -249,9 +248,9 @@ def print_info(options,response,location):
     elif options.sunrise:
         sunrise = datetime.utcfromtimestamp(int(response.json()['sys']['sunrise']) +
                                             int(response.json()['timezone'])).strftime('%H:%M:%S')
-        time_offset = str(int(response.json()['timezone'])//3600)
+        time_offset = str(int(response.json()['timezone']) // 3600)
 
-        if int(time_offset) > 0 < 10:
+        if (0 < int(time_offset)) and (int(time_offset) < 10):
             time_offset = "+0" + str(time_offset)
         elif int(time_offset) >= 10:
             time_offset = "+" + str(time_offset)
@@ -265,9 +264,9 @@ def print_info(options,response,location):
     elif options.sunset:
         sunset = datetime.utcfromtimestamp(int(response.json()['sys']['sunset']) +
                                             int(response.json()['timezone'])).strftime('%H:%M:%S')
-        time_offset = str(int(response.json()['timezone'])//3600)
+        time_offset = str(int(response.json()['timezone']) // 3600)
 
-        if int(time_offset) > 0 < 10:
+        if (0 < int(time_offset)) and (int(time_offset) < 10):
             time_offset = "+0" + str(time_offset)
         elif int(time_offset) >= 10:
             time_offset = "+" + str(time_offset)
