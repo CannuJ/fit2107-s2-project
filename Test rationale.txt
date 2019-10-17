@@ -1,0 +1,69 @@
+Approach:
+The approach we are using to come up with the unit test cases is to get high branch coverage for our program WeatherForecast.py. Thus, we are aiming to go through every branch the program has with the unit test cases we have.
+There are 7 individual functions in our program excluded the main driver function. As function “jprint(obj)” and “debug(response, options)” are functions that prints information and do not hold any branch within them we are not performing unit tests on these two functions. Therefore, we have 5 functions that we need to come up with unit test cases for them.
+
+Function 1: weather_args(), this function creates the weather option arguments parser for our program and returns the parser.
+We need to test if this function can hold all the valid options and if a system exit will be occurred when an invalid option is provided. As there are 14 options and an invalid case, we need to have 15 test cases to see if the function can hold these 14 options individually and the invalid cases. These tests are grouped into a class named parser_test.
+Class: parser_test
+Test 1: test_api()
+Test 2: test_city()
+Test 3: test_cid()
+Test 4: test_gc()
+Test 5: test_z()
+Test 6: test_time()
+Test 7: test_temp()
+Test 8: test_pressure()
+Test 9: test_cloud()
+Test 10: test_humidity()
+Test 11: test_wind()
+Test 12: test_sunset()
+Test 13: test_sunrise()
+Test 14: test_debug()
+Test 15: test_invalid()
+
+Function 2: check_num_of_location_input(options), this functions check if the input options by users contain only one location. It will return true if there is only one location otherwise a false will be returned, and a warning message will be printed.
+As there are 4 options of user input supply a location, we need to test if this function will return true when we only supply each of these options. And test the cases which we supply two location options and no location option. Hence, 6 test cases are needed for this function. They are grouped into a class named check_num_of_location_input_test.
+Class: check_num_of_location_input_test
+Test 1: test_city_only()
+Test 2: test_cid_only()
+Test 3: test_z_only()
+Test 4: test_gc_only()
+Test 5: test_no__location_input()
+Test 6: test_combination()
+
+Function 4 check_response(response), this function checks the status code of the response and return false if the response status code is indicating an error and the error message will be printed. True will be returned if there is no error.
+As there are 4 types of response error status code, we need to check if the function can handle these four status code and the valid status code. Hence, 5 test cases are needed. Therese tests are grouped into a class called check_response_test.
+Class: check_response_test
+Test 1: test_400()
+Test 2: test_401()
+Test 3: test_404()
+Test 4: test_429()
+Test 5: test_valid_200()
+
+Function 5 output_info(option, response, location), this function returns an output string to print based on the option the users provide for the app WeatherForecast.py. Different option will cause different output string.
+As there are 13 options that can affect the output string, we need to test each one of them individually and see if the expected outcome matches the actual outcome. There is one possible outcome when time option is provided, hence we need 1 test case for it. There are 2 possible outcomes when different unit for temp option are provided, hence we need 2 test cases for it. There is 1 outcome for pressure option, only 1 test case is needed. There are 2 possible outcomes for cloud hence 2 test cases are needed. There is only 1 outcome for humidity and therefore only 1 test case is needed. 4 different outcomes for wind when different unit is provided and if the degree information is missing, hence we need 4 test cases for it. Sunrise and sunset will need 2 for them being select individually and 1 when they both are inputted by the users. In total there are 1+2+1+2+4+1+2+1 = 14 test cases are needed in total. They are grouped into a class named output_info_test.
+Class: output_info_test
+Test 1: test_time()
+Test 2: test_temp_imperial()
+Test 3: test_temp_metric()
+Test 4: test_pressure()
+Test 5: test_not_cloudy()
+Test 6: test_cloudy()
+Test 7: test_humidity()
+Test 8: test_wind_with_degree_imperial()
+Test 9: test_wind_with_degree_metric()
+Test 10: test_wind_without_degree_imperial()
+Test 11: test_wind_without_degree_metric()
+Test 12: test_sunrise_and_sunset()
+Test 13: test_sunrise()
+Test 14: test_sunset()
+
+
+
+
+
+
+
+
+
+
