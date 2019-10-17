@@ -4,6 +4,7 @@ from optparse import OptionParser
 from WeatherForecast import *
 from unittest.mock import patch
 import sys
+import responses
 
 
 class parser_test(unittest.TestCase):
@@ -100,10 +101,154 @@ class check_num_of_location_input_test(unittest.TestCase):
         self.assertFalse(check_num_of_location_input(option))
 
 class output_info_test(unittest.TestCase):
+
     def setUp(self):
-        self.normalResponse = requests.get("http://www.mocky.io/v2/5da70169340000474763346f")
-        self.cloudyResponse = requests.get("http://www.mocky.io/v2/5da718ef2f00005c0036824b")
-        self.nodegreeWindResponse = requests.get("http://www.mocky.io/v2/5da71f6a2f000049003682a8")
+        normal_response = ({
+            "coord": {
+                "lon": 144.96,
+                "lat": -37.81
+            },
+            "weather": [
+                {
+                    "id": 500,
+                    "main": "Rain",
+                    "description": "light rain",
+                    "icon": "10n"
+                }
+            ],
+            "base": "stations",
+            "main": {
+                "temp": 12.05,
+                "pressure": 1009,
+                "humidity": 87,
+                "temp_min": 10.56,
+                "temp_max": 13.89
+            },
+            "visibility": 10000,
+            "wind": {
+                "speed": 1.5,
+                "deg": 140
+            },
+            "rain": {
+                "3h": 0.126
+            },
+            "clouds": {
+                "all": 26
+            },
+            "dt": 1571225078,
+            "sys": {
+                "type": 1,
+                "id": 9548,
+                "country": "AU",
+                "sunrise": 1571168063,
+                "sunset": 1571215023
+            },
+            "timezone": 39600,
+            "id": 2158177,
+            "name": "Melbourne",
+            "cod": 200
+        })
+        cloudy_response = ({
+            "coord": {
+                "lon": 113.26,
+                "lat": 23.13
+            },
+            "weather": [
+                {
+                    "id": 803,
+                    "main": "Clouds",
+                    "description": "broken clouds",
+                    "icon": "04n"
+                }
+            ],
+            "base": "stations",
+            "main": {
+                "temp": 25.7,
+                "pressure": 1018,
+                "humidity": 65,
+                "temp_min": 25,
+                "temp_max": 26.67
+            },
+            "visibility": 10000,
+            "wind": {
+                "speed": 3,
+                "deg": 40
+            },
+            "rain": {},
+            "clouds": {
+                "all": 66
+            },
+            "dt": 1571231948,
+            "sys": {
+                "type": 1,
+                "id": 9620,
+                "country": "CN",
+                "sunrise": 1571178226,
+                "sunset": 1571220074
+            },
+            "timezone": 28800,
+            "id": 1809858,
+            "name": "Guangzhou",
+            "cod": 200
+        })
+        no_degree_wind_response = ({
+            "coord": {
+                "lon": 144.96,
+                "lat": -37.81
+            },
+            "weather": [
+                {
+                    "id": 500,
+                    "main": "Rain",
+                    "description": "light rain",
+                    "icon": "10n"
+                }
+            ],
+            "base": "stations",
+            "main": {
+                "temp": 12.05,
+                "pressure": 1009,
+                "humidity": 87,
+                "temp_min": 10.56,
+                "temp_max": 13.89
+            },
+            "visibility": 10000,
+            "wind": {
+                "speed": 1.5
+            },
+            "rain": {
+                "3h": 0.126
+            },
+            "clouds": {
+                "all": 26
+            },
+            "dt": 1571225078,
+            "sys": {
+                "type": 1,
+                "id": 9548,
+                "country": "AU",
+                "sunrise": 1571168063,
+                "sunset": 1571215023
+            },
+            "timezone": 39600,
+            "id": 2158177,
+            "name": "Melbourne",
+            "cod": 200
+        })
+
+
+        with responses.RequestsMock() as response:
+            response.add(responses.GET, 'http://normal.response.url', json=normal_response, status=404)
+            self.normalResponse = requests.get("http://normal.response.url")
+
+        with responses.RequestsMock() as response:
+            response.add(responses.GET, 'http://cloudy.response.url', json=cloudy_response, status=404)
+            self.cloudyResponse = requests.get("http://cloudy.response.url")
+
+        with responses.RequestsMock() as response:
+            response.add(responses.GET, 'http://no.degree.wind.response.url', json=no_degree_wind_response, status=404)
+            self.nodegreeWindResponse = requests.get("http://no.degree.wind.response.url")
+
         self.parser = weather_args()
         self.location = "somewhere"
 
