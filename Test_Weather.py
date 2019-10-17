@@ -76,19 +76,19 @@ class check_num_of_location_input_test(unittest.TestCase):
     def setUp(self):
         self.parser = weather_args()
 
-    def test_city(self):
+    def test_city_only(self):
         (option, self.parser) = self.parser.parse_args(["--city=CITY"])
         self.assertTrue(check_num_of_location_input(option))
 
-    def test_cid(self):
+    def test_cid_only(self):
         (option, self.parser) = self.parser.parse_args(["--cid=code"])
         self.assertTrue(check_num_of_location_input(option))
 
-    def test_gc(self):
+    def test_gc_only(self):
         (option, self.parser) = self.parser.parse_args(['--gc=[23°01′0″ 113°07′0″]'])
         self.assertTrue(check_num_of_location_input(option))
 
-    def test_z(self):
+    def test_z_only(self):
         (option, self.parser) = self.parser.parse_args(['-z=zipcode'])
         self.assertTrue(check_num_of_location_input(option))
 
