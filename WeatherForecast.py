@@ -67,13 +67,14 @@ def get_response(options):
     # Prepare parameters that are sent to API
 
     # Parameter only takes "Metric" and "Imperial". Correct accordingly
-    if options.temp == "Celsius":
-        options.temp = "Metric"
-    if options.temp == "Fahrenheit":
-        options.temp = "Imperial"
-    else:
-        print("\nInvalid temperature type, outputting in Celsius (C)")
-        options.temp = "Metric"
+    if options.temp != "Metric":
+        if options.temp == "Celsius":
+            options.temp = "Metric"
+        elif options.temp == "Fahrenheit":
+            options.temp = "Imperial"
+        else:
+            print("\nInvalid temperature type, outputting in Celsius (C)")
+            options.temp = "Metric"
 
     if options.gc:
 
@@ -88,8 +89,7 @@ def get_response(options):
                 "units": options.temp,
             }
         except:
-            print("\nIncorrect format for Geographic Coordinates. Usage: --gc \"Latitude Longitude\"\n")
-            exit(1)
+            return(314) # Random Error Code for Invalid Geographic Coordinates
 
     else:
         parameters = {
@@ -107,6 +107,10 @@ def get_response(options):
 
 def check_response(response):
     # Check if response was valid
+
+    if str(response) == "314":
+        print("\nError 314 - Incorrect format for Geographic Coordinates. Usage: --gc \"Latitude Longitude\"\n")
+        return False
 
     if str(response.status_code) == "400":
         print("\nError 400 - " + str(response.json()['message']) + "\n")

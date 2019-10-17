@@ -85,7 +85,7 @@ class check_num_of_location_input_test(unittest.TestCase):
         self.assertTrue(check_num_of_location_input(option))
 
     def test_gc_only(self):
-        (option, self.parser) = self.parser.parse_args(['--gc=[23°01′0″ 113°07′0″]'])
+        (option, self.parser) = self.parser.parse_args(['--gc=[23.01.0 113.07.0]'])
         self.assertTrue(check_num_of_location_input(option))
 
     def test_z_only(self):
@@ -99,6 +99,34 @@ class check_num_of_location_input_test(unittest.TestCase):
     def test_combination(self):
         (option, self.parser) = self.parser.parse_args(["--city=CITY", "--cid=CityID"])
         self.assertFalse(check_num_of_location_input(option))
+
+class get__check_response_test(unittest.TestCase):
+    def setUp(self):
+        self.parser = weather_args()
+
+    def test_metric_gc(self):
+        (option, self.parser) = self.parser.parse_args(["--temp=Celsius", "--gc=-37.81 144.96"])
+        self.assertTrue(check_response(get_response(option)))
+
+    def test_invalid_temp(self):
+        (option, self.parser) = self.parser.parse_args(["--temp=Kelvin", "--gc=-37.81 144.96"])
+        self.assertTrue(check_response(get_response(option)))
+
+    def test_invalid_gc(self):
+        (option, self.parser) = self.parser.parse_args(["--gc=23"])
+        self.assertFalse(check_response(get_response(option)))
+
+    def test_no_location(self):
+        (option, self.parser) = self.parser.parse_args(["--temp=Celsius"])
+        self.assertFalse(check_response(get_response(option)))
+
+    def test_invalid_api(self):
+        (option, self.parser) = self.parser.parse_args(["--api=thisIsInvalid"])
+        self.assertFalse(check_response(get_response(option)))
+
+    def test_city_not_found(self):
+        (option, self.parser) = self.parser.parse_args(["--city=Melbonre"])
+        self.assertFalse(check_response(get_response(option)))
 
 class output_info_test(unittest.TestCase):
 
