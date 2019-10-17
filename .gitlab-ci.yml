@@ -1,14 +1,6 @@
 image: python:latest
 
-before_script:
-  - python -V               # Print out python version for debugging
-  - python3 -m venv venv
-  - . venv/bin/activate
-  - pip install -r requirements.txt
-  
-
 test:
   script:
-  - . venv/bin/activate
-  - pytest -v --cov=calculator
+    - python Test_Weather.py
 
