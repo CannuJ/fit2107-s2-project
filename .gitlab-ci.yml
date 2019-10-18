@@ -1,6 +1,7 @@
 image: python:latest
 
 before_script:
+  - pip install responses
   - pip install requests
 
 test:
