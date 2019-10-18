@@ -1,7 +1,4 @@
 datetime
 requests
-sys
-unittest
 optparse
-unittest.mock
 responses
