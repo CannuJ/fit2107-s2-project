@@ -108,6 +108,14 @@ class get_response_test(unittest.TestCase):
         (option, self.parser) = self.parser.parse_args(["--temp=Celsius", "--gc=-37.81 144.96"])
         self.assertTrue(check_response(get_response(option)))
 
+    def test_imperial_gc(self):
+        (option, self.parser) = self.parser.parse_args(["--temp=Fahrenheit", "--gc=-37.81 144.96"])
+        self.assertTrue(check_response(get_response(option)))
+
+    def test_valid_city(self):
+        (option, self.parser) = self.parser.parse_args(["--city=Melbourne"])
+        self.assertTrue(check_response(get_response(option)))
+
     def test_invalid_temp(self):
         (option, self.parser) = self.parser.parse_args(["--temp=Kelvin", "--gc=-37.81 144.96"])
         self.assertTrue(check_response(get_response(option)))
@@ -185,6 +193,9 @@ class check_response_test(unittest.TestCase):
 
     def test_200(self):
         self.assertTrue(check_response(self.code_200_Response))
+
+    def test_314(self):
+        self.assertFalse(check_response(314))
 
 class output_info_test(unittest.TestCase):
 
