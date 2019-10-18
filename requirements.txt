@@ -4,5 +4,4 @@ sys
 unittest
 optparse
 unittest.mock
-sys
 responses
