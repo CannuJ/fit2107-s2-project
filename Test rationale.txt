@@ -31,16 +31,29 @@ Test 4: test_gc_only()
 Test 5: test_no__location_input()
 Test 6: test_combination()
 
-Function 4 check_response(response), this function checks the status code of the response and return false if the response status code is indicating an error and the error message will be printed. True will be returned if there is no error.
-As there are 4 types of response error status code, we need to check if the function can handle these four status code and the valid status code. Hence, 5 test cases are needed. Therese tests are grouped into a class called check_response_test.
+Function 3: get_response(options), this function use the users input option as parameters and ask for a response from the url. The response will then be returned. 
+There are 4 options that can change the parameters for the responses, they are gc, temperature, city and api. There are 2 combination for 2 different units of temp combine with valid gc hence 2 test cases are needed. There are 2 situation whether the city is found, hence there are 2 test cases needed for city options. 1 test case each is needed to check if the response can handle invalid temperature unit, invalid api and invalid gc. 1 test case is needed to check if the response can handle no location. Therefore, 2+2+1+1+1+1 = 8 test cases are needed in total. They are grouped into a class named get_response_test.
+Class: get_response_test
+Test 1: test_metric_gc()
+Test 2: test_imperial_gc()
+Test 3: test_valid_city()
+Test 4: test_invalid_temp()
+Test 5: test_invalid_gc()
+Test 6: test_no_location()
+Test 7: test_invalid_api()
+Test 8: test_city_not_found()
+
+Function 4: check_response(response), this function checks the status code of the response and return false if the response status code is indicating an error and the error message will be printed. True will be returned if there is no error.
+As there are 5 types of response error status code, we need to check if the function can handle these four status code and the valid status code. Hence, 6 test cases are needed. Therese tests are grouped into a class called check_response_test.
 Class: check_response_test
 Test 1: test_400()
 Test 2: test_401()
 Test 3: test_404()
 Test 4: test_429()
-Test 5: test_valid_200()
+Test 5: test_200()
+Test 6: test_314()
 
-Function 5 output_info(option, response, location), this function returns an output string to print based on the option the users provide for the app WeatherForecast.py. Different option will cause different output string.
+Function 5: output_info(option, response, location), this function returns an output string to print based on the option the users provide for the app WeatherForecast.py. Different option will cause different output string.
 As there are 13 options that can affect the output string, we need to test each one of them individually and see if the expected outcome matches the actual outcome. There is one possible outcome when time option is provided, hence we need 1 test case for it. There are 2 possible outcomes when different unit for temp option are provided, hence we need 2 test cases for it. There is 1 outcome for pressure option, only 1 test case is needed. There are 2 possible outcomes for cloud hence 2 test cases are needed. There is only 1 outcome for humidity and therefore only 1 test case is needed. 4 different outcomes for wind when different unit is provided and if the degree information is missing, hence we need 4 test cases for it. Sunrise and sunset will need 2 for them being select individually and 1 when they both are inputted by the users. In total there are 1+2+1+2+4+1+2+1 = 14 test cases are needed in total. They are grouped into a class named output_info_test.
 Class: output_info_test
 Test 1: test_time()
@@ -58,12 +71,7 @@ Test 12: test_sunrise_and_sunset()
 Test 13: test_sunrise()
 Test 14: test_sunset()
 
-
-
-
-
-
-
-
+Coverage report summary:
+Altogether there are 49 test cases in our unit test file, a branch coverage of 79% with the original program WeatherForecast.py file is achieved.
 
 
