@@ -1,5 +1,8 @@
 image: python:latest
 
+before_script:
+  - pip install requests
+
 test:
   script:
     - python Test_Weather.py
