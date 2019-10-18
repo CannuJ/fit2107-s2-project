@@ -100,7 +100,7 @@ class check_num_of_location_input_test(unittest.TestCase):
         (option, self.parser) = self.parser.parse_args(["--city=CITY", "--cid=CityID"])
         self.assertFalse(check_num_of_location_input(option))
 
-class get__check_response_test(unittest.TestCase):
+class get_response_test(unittest.TestCase):
     def setUp(self):
         self.parser = weather_args()
 
@@ -127,6 +127,64 @@ class get__check_response_test(unittest.TestCase):
     def test_city_not_found(self):
         (option, self.parser) = self.parser.parse_args(["--city=Melbonre"])
         self.assertFalse(check_response(get_response(option)))
+
+class check_response_test(unittest.TestCase):
+    def setUp(self):
+        code_200_response = ({
+            "message": "Mock valid response",
+            "cod": 200
+        })
+        code_400_response = ({
+            "message": "bad request",
+            "cod": 400
+        })
+        code_401_response = ({
+            "message": "Invalid API key. Please see http://openweathermap.org/faq#error401 for more info.",
+            "cod": 401
+        })
+        code_404_response = ({
+            "message": "city not found",
+            "cod": 404
+        })
+        code_429_response = ({
+            "message": "API key blocked",
+            "cod": 429
+        })
+
+        with responses.RequestsMock() as response:
+            response.add(responses.GET, 'http://400.response.url', json=code_400_response, status=400)
+            self.code_400_Response = requests.get("http://400.response.url")
+
+        with responses.RequestsMock() as response:
+            response.add(responses.GET, 'http://401.response.url', json=code_401_response, status=401)
+            self.code_401_Response = requests.get("http://401.response.url")
+
+        with responses.RequestsMock() as response:
+            response.add(responses.GET, 'http://404.response.url', json=code_404_response, status=404)
+            self.code_404_Response = requests.get("http://404.response.url")
+
+        with responses.RequestsMock() as response:
+            response.add(responses.GET, 'http://429.response.url', json=code_429_response, status=429)
+            self.code_429_Response = requests.get("http://429.response.url")
+
+        with responses.RequestsMock() as response:
+            response.add(responses.GET, 'http://200.response.url', json=code_200_response, status=200)
+            self.code_200_Response = requests.get("http://200.response.url")
+
+    def test_400(self):
+        self.assertFalse(check_response(self.code_400_Response))
+
+    def test_401(self):
+        self.assertFalse(check_response(self.code_401_Response))
+
+    def test_404(self):
+        self.assertFalse(check_response(self.code_404_Response))
+
+    def test_429(self):
+        self.assertFalse(check_response(self.code_429_Response))
+
+    def test_200(self):
+        self.assertTrue(check_response(self.code_200_Response))
 
 class output_info_test(unittest.TestCase):
 

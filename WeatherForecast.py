@@ -292,12 +292,12 @@ def main():
 
     response = get_response(options)
 
-    if not check_response(response):
-        exit(1)
-
     # Debug Conditional
     if options.debug:
         debug(response, options)
+
+    if not check_response(response):
+        exit(1)
 
     # Print city information
     try:
